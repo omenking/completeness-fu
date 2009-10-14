@@ -9,7 +9,7 @@ module CompletenessFu
       sb = ScoringBuilder.new
       
       sb.completeness_checks = []
-      sb.default_weighting   = CompletenessFu.default_weightings
+      sb.default_weighting   = CompletenessFu.default_weighting
       sb.model_weightings    = CompletenessFu.common_weightings
       
       sb.instance_eval(&block)
@@ -24,9 +24,15 @@ module CompletenessFu
     private
     
       def check(name, check, weighting = nil)
-        weighting ||= self.default_weighting
-        weighting = self.model_weightings[weighting] if weighting.is_a?(Symbol)
-        self.completeness_checks << { :name => name, :check => check, :weighting => weighting}
+        if weighting.nil?
+          weight_grade = self.default_weighting
+          weighting ||= self.model_weightings[self.default_weighting]
+        else
+          weight_grade = weighting
+          weighting = self.model_weightings[weighting]
+        end
+
+        self.completeness_checks << { :name => name, :check => check, :weighting => weighting, :weight_grade => weight_grade}
       end
 
       def weightings(custom_weighting_opts)

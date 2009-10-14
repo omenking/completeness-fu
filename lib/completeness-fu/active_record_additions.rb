@@ -2,7 +2,7 @@ module CompletenessFu
   
   class << self
     attr_accessor :common_weightings
-    attr_accessor :default_weightings
+    attr_accessor :default_weighting
     attr_accessor :default_i18n_namespace
     attr_accessor :default_grading
   end
@@ -33,7 +33,7 @@ module CompletenessFu
     
     module ClassMethods
       def max_completeness_score
-        self.completeness_checks.inject(0) { |score, check| score += check[:weighting] }
+        self.completeness_checks.inject(0) { |score, check| score += check[:weighting].to_f }
       end
     end
     
@@ -73,6 +73,16 @@ module CompletenessFu
         self.completeness_score.to_f / self.class.max_completeness_score.to_f  * 100
       end
       
+      #returns next_failed_check
+      def next_failed_check
+        self.failed_checks.first
+      end
+      
+      #returns the perctenage of next possible completeness
+      def next_percent_complete
+        (self.completeness_score.to_f + self.failed_checks.first[:weighting]) / self.class.max_completeness_score.to_f  * 100
+      end
+      
       # returns a basic 'grading' based on percent_complete, defaults are :high, :medium, :low, and :poor
       def completeness_grade
         CompletenessFu.default_grading.each do |grading| 
@@ -84,7 +94,7 @@ module CompletenessFu
       private 
       
         def translate_check_details(full_check)
-          namespace = CompletenessFu.default_i18n_namespace + [self.class.name.downcase.to_sym, full_check[:name]]
+          namespace = CompletenessFu.default_i18n_namespace + [self.class.name.downcase.to_sym, full_check[:weight_grade]]
           
           translations = [:title, :description, :extra].inject({}) do |list, field|
                            list[field] = I18n.t(field.to_sym, :scope => namespace)

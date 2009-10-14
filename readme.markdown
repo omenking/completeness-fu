@@ -34,8 +34,7 @@ And what you get for free on the model : _passed\_checks_, _failed\_checks_, _co
 You can also add the following to an initializer to set some defaults:
 
     CompletenessScoring.common_weights = { :low => 30, :medium => 50, :high => 70 }
-
-    CompletenessScoring.default_weighting = :medium
+    CompletenessFu.default_weighting = :medium
 
 You can also override defaults per model or use symbols for the checks instead of lambdas, thus allowing you to place check logic as methods in your class (public or private).
 
